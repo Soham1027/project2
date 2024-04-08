@@ -1,0 +1,246 @@
+
+# @api_view(['GET'])
+# def GetPlayerView(request):
+#     response ={'status':200}
+#     player_objs=Coaches.objects.all()
+#     serializer=CoachSerializer(player_objs,many=True)
+#     response['data']=serializer.data # type: ignore
+    
+#     return Response(response)
+
+
+# @api_view(['POST'])
+# def PostPlayerView(request):
+#     response ={'status':200}
+#     data=request.data
+#     serializer=PlayerSerializer(data=data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(response)
+    
+#     return Response(serializer.errors)
+
+
+
+# @api_view(['POST'])
+# def PostCourtDetailView(request):
+#     response ={'status':200}
+#     data=request.data
+#     serializer=CourtDetailSerializer(data=data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(response)
+    
+#     return Response(serializer.errors)
+
+
+
+    # def get(self, request, *args, **kwargs):
+    #     return self.update(request, *args, **kwargs)
+    
+    # def post(self, request, *args, **kwargs):
+    #     return self.create(request, *args, **kwargs)
+
+
+
+
+
+    login:
+
+    class UserView(mixins.CreateModelMixin, generics.GenericAPIView):
+    serializer_class=UserSerializer
+  
+    def post(self, request,*args, **kwargs):
+        try:
+            data=request.data
+            serializer=UserSerializer(data=data)
+            if serializer.is_valid():
+                username=data.get('username')
+                password=data.get('password')
+                user=authenticate(username=username,password=password)
+                if user:
+                    user_token=Token.objects.get_or_create(user=user)
+                    serializer.save()
+                    return Response({
+                        'status':200,
+                        'token':str(user_token)
+                    })
+                    
+                return Response({
+                    'status':400,
+                    'message ':'Invlaid credential'
+                
+                })
+          
+                
+         
+        except Exception as e:
+            print(e) 
+            return Response({
+                'status':400,
+                "message":"Something went wrong",
+            })
+
+@api_view(['PATCH'])
+def PatchProfileView(request):
+    response={'status':200}
+    data=request.data
+    try:
+        obj=Profile.objects.get(id=data.get('id'))
+        serializer=UpdateProfileSerializer(obj,data=data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response['data']=serializer.data# type: ignore
+            return Response(response)
+        else :
+            return Response(serializer.errors)
+    except Exception as e:
+        print(e)
+    return Response({'status':400,'message':'invalid id'})
+
+@api_view(['DELETE'])
+def DeleteTodoView(request):
+    response={'status':200}
+    data=request.data 
+    try:
+        obj=Profile.objects.get(id=data.get('id'))
+        obj.delete()
+        return Response({'status':200,'message':"Deleted"})
+    except Exception as e:
+        print(e)
+    return Response({'status':400,'message':"Invalid id"})
+
+   
+
+    def update(self,instance,validated_data):
+        nested_data=validated_data.pop('user_data',None)
+        if nested_data is not None:
+            nested_serializer=ProfileSerializer(instance.nested_instance,data=nested_data)
+            if nested_serializer.is_valid():
+                nested_serializer.save()
+            else:
+                raise serializers.ValidationError(nested_serializer.errors)
+        return super().update(instance,validated_data)
+
+
+
+filter_horizontal to choose multiple but only in many to many
+
+
+
+
+
+{
+    "name":"sg2",
+    "birthdate":"2002-04-02",
+    "gender":"MALE",
+    "nationality":"IN",
+    "phone":"+919293949534",
+    "user_data_id":5,
+    "addresses":[
+      {
+         "flat_no":7,
+         "landmark":"albc",
+         "area":"xyjz",
+         "city":"Ahmedabad",
+         "zip_code":"354345"
+        }
+        ]
+
+}
+
+
+
+
+# class TestProfileDetailView(APIView):  
+    # serializer_class=TestProfileSerializer
+    # queryset=Profiles.objects.all()
+  
+   
+    
+    # def get(self, request,format=None, *args, **kwargs):
+       
+     
+        
+    #     profile_objs=Profiles.objects.all()
+    #     serializer=TestProfileSerializer(profile_objs,many=True)
+       
+        
+    #     return Response(serializer.data)
+    # def post(self, request, *args, **kwargs):
+        
+        
+    #     data=request.data
+    #     serializer=TestProfileSerializer(data=data)
+      
+    #     if serializer.is_valid():
+      
+    #         serializer.save()
+    #         response={"status":200,"message":"User Register"}
+    #         return Response(response)
+    #     return Response(serializer.errors)
+            
+    # def patch(self,request,*args, **kwargs):
+    
+    #     response={'status':200}
+    #     data=request.data
+    #     try:
+    #         obj=Profiles.objects.get(id=data.get('id'))
+    #         serializer=TestProfileSerializer(obj,data=data,partial=True)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #             response['data']=serializer.data# type: ignore
+    #             response={"status":200,"message":"User updated"}
+    #         else :
+    #             return Response(serializer.errors)
+    #     except Exception as e:
+    #         print(e)
+    #     return Response({'status':400,'message':'invalid id'})
+
+
+        
+# class TestAddressSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Addresses
+#         fields = '__all__'
+
+# class TestProfileSerializer(serializers.ModelSerializer):
+#     addresses = AddressSerializer(many=True,read_only=True)  
+
+#     class Meta:
+#         model = Profiles
+#         fields = '__all__'
+
+#     def create(self, validated_data):
+#         addresses_data = validated_data.pop('addresses')
+#         profile = Profiles.objects.create(**validated_data)
+#         for address_data in addresses_data:
+            
+#             Addresses.objects.create(profile_data_id=profile, **address_data)
+#         return profile
+
+
+
+
+
+
+
+
+get role for profile
+    permission_classes=[IsAuthenticated]
+    def get_user_role(self,user_id):
+        try:
+            uder=UserDatas.objects.get(id=user_id)
+            return uder.role
+        except UserDatas.DoesNotExist:
+            return("user not exist")
+    def get(self, request, *args, **kwargs):
+        user_id=None
+        try:
+           token=request.headers['Authorization'].split(' ')[1]
+           user_id=AccessToken(token).payload['user_id']
+           print(user_id)
+        except KeyError:
+            return("header misiing")
+        user_role=self.get_user_role(user_id)
+        return Response({'user_role':user_role},status=200) 
