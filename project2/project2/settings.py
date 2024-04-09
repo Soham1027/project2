@@ -184,4 +184,4 @@ REST_FRAMEWORK = {
 
 }
 
-# AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'
+AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'

@@ -18,7 +18,8 @@ from .models import(
 )
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True,required=True, style={'input_type': 'password', 'placeholder': 'Password'})
+    password=serializers.CharField(write_only=True,required=True, style={'input_type': 'password', 'placeholder': 'Password'})
+    
     confirm_password=serializers.CharField(write_only=True,required=True, style={'input_type': 'password', 'placeholder': 'Password'})
     class Meta:
         model = UserDatas
@@ -26,9 +27,8 @@ class UserSerializer(serializers.ModelSerializer):
         
         
     def create(self, validated_data):
-        validated_data['password']=make_password(validated_data['password'])
-        validated_data['confirm_password']=make_password(validated_data['confirm_password'])
-        return super().create(validated_data)
+       user=UserDatas.objects.create(**validated_data)
+       return user
      
     def validate(self, attrs):
         if attrs['confirm_password'] != attrs['password']:
@@ -248,30 +248,18 @@ class TestProfileSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         addresses_data = validated_data.pop('addresses', None)
-        player_data=validated_data.pop('player',None)
+        player_data = validated_data.pop('player', None)
         coach_data=validated_data.pop('coach',None)
-        # user_data_id=validated_data.get('user_data_id')
-        role=validated_data.get('user_data_id').role
-
-        # if role=='Player':
-        #   
-        # elif role=='Coach':
-        #   
-        
         profile_instance = Profiles.objects.create(**validated_data)
         if addresses_data:
             Addresses.objects.create(profile_data_id=profile_instance, **addresses_data)
-     
-        if player_data is not None:
+        if player_data:
             Players.objects.create(player_profile_id=profile_instance, **player_data)
-    
-        if coach_data is not None:
-            
+        if coach_data:
             Coaches.objects.create(coaches_profile_id=profile_instance, **coach_data)
-                
-        
+       
+       
         return profile_instance
-    
 
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop('addresses', None)

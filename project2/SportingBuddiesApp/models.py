@@ -3,7 +3,7 @@ from django.utils import timezone
 from typing import Any
 from django.db import models
 from django.core.validators import EmailValidator,MinLengthValidator,MaxValueValidator
-
+from django.contrib.auth.models import AbstractUser
 from indian_cities.dj_city import cities    #type:ignore
 from django_countries.fields import CountryField    #type:ignore
 from phonenumber_field.modelfields import PhoneNumberField  #type:ignore
@@ -42,11 +42,9 @@ SURFACE_CHOICES = (
   
 )
     
-class UserDatas(models.Model):
-    id=models.AutoField(primary_key=True)	
-    email=models.EmailField(max_length=50,validators=[EmailValidator(message="enter valid email")])
-    password=models.CharField(max_length=300,validators=[MinLengthValidator(4)])
-    confirm_password=models.CharField(max_length=300)
+class UserDatas(AbstractUser):
+    
+    confirm_password=models.CharField(max_length=300,null=True)
     role=models.CharField(choices=ROLE_CHOICES,max_length=20)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)

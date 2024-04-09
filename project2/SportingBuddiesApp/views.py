@@ -1,6 +1,8 @@
 
+from base64 import decode
 from django.http import JsonResponse
 from django.shortcuts import render,redirect
+from jwt import InvalidTokenError
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -126,8 +128,9 @@ class LoginView(APIView):
             'access':str(refresh.access_token)
         }
         
+        serializer=UserSerializer(users)
       
-        return Response({'token':token})
+        return Response({'token':token,'data':serializer.data})
 
   
 class LogoutView(APIView):
@@ -144,15 +147,27 @@ class LogoutView(APIView):
       
         
   
-###########PROFILE##########
+
+
 class TestToken(APIView):
-    permission_classes=(IsAuthenticated,)
-    authentication_classes=[JWTAuthentication]
- 
+    # permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     
-    def get(self,request,*args, **kwargs):
-        return Response("ok")
-        
+    def get(self, request, *args, **kwargs):
+        # try:
+        token = request.headers['Authorization'].split(' ')[1] 
+        print(token)
+        #     decoded_token = decode(token, 'your_secret_key', algorithms=['HS256']) # type: ignore
+        #     user_id = decoded_token['user_id']  # Extract user_id from decoded token
+        #     user = UserDatas.objects.get(id=user_id)  # Get user object using user_id
+        #     # You can perform additional checks or operations here if needed
+        #     return Response("Authorized", status=200)
+        # except KeyError:
+        #     return Response("Token not provided", status=400)
+        # except InvalidTokenError:
+        #     return Response("Invalid token", status=400)
+        # except UserDatas.DoesNotExist:
+        #     return Response("U not found", status=400)
   
 
 # class TestProfileDetailView(APIView):  

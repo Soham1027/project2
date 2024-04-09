@@ -244,3 +244,6 @@ get role for profile
             return("header misiing")
         user_role=self.get_user_role(user_id)
         return Response({'user_role':user_role},status=200) 
+decode token
+access_token=AccessToken(refresh.access_token)
+user_id=access_token.payload.get('user_id')
