@@ -93,45 +93,41 @@ class UserView(APIView):
 
 
 class LoginView(APIView):
-    permission_classes = [AllowAny,]
-
+  
     serializer_class=LoginSerializer
     
+   
     def post(self, request,*args, **kwargs):
         email=request.data.get('email')
         password=request.data.get('password')
         role=request.data.get('role')
         
         try:
-            users=UserDatas.objects.get(email=email)
+            user=UserDatas.objects.get(email=email)
             print(password)
-            print(users.password)
+            print(user.password)
           
         except UserDatas.DoesNotExist:
             return Response({'error':'Invalid'},status=400)
         
-        if not check_password(password,users.password):
+        if not check_password(password,user.password):
             print(password)
-            print(users.password)
+            print(user.password)
             return Response({'error':'Password Invalid'},status=400) 
            
-        if role!=users.role:
+        if role!=user.role:
                return Response({'error':'Role Not match'},status=400)    
-        
-       
-          
-          
-        refresh=RefreshToken.for_user(users)
+           
+        refresh=RefreshToken.for_user(user)
       
         token={
             'refresh':str(refresh),
             'access':str(refresh.access_token)
         }
-        
-        serializer=UserSerializer(users)
+        serializer=UserSerializer(user)
       
-        return Response({'token':token,'data':serializer.data})
-
+        return Response({'token':token,'user':serializer.data})
+  
   
 class LogoutView(APIView):
     serializer_class=UserLogoutSerializer

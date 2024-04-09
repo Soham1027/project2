@@ -18,8 +18,7 @@ from .models import(
 )
 
 class UserSerializer(serializers.ModelSerializer):
-    password=serializers.CharField(write_only=True,required=True, style={'input_type': 'password', 'placeholder': 'Password'})
-    
+    password = serializers.CharField(write_only=True,required=True, style={'input_type': 'password', 'placeholder': 'Password'})
     confirm_password=serializers.CharField(write_only=True,required=True, style={'input_type': 'password', 'placeholder': 'Password'})
     class Meta:
         model = UserDatas
@@ -27,8 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
         
         
     def create(self, validated_data):
-       user=UserDatas.objects.create(**validated_data)
-       return user
+        validated_data['password']=make_password(validated_data['password'])
+        validated_data['confirm_password']=make_password(validated_data['confirm_password'])
+        return super().create(validated_data)
      
     def validate(self, attrs):
         if attrs['confirm_password'] != attrs['password']:
