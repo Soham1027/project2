@@ -46,7 +46,7 @@ class LoginSerializer(serializers.ModelSerializer):
    
 
 class ProfileSerializer(serializers.ModelSerializer):
-    phone = PhoneNumberField(region="IN") # type: ignore
+    phone = PhoneNumberField(region="IN")
     # user_data_id=UserSerializer(many=False)
  
   
@@ -67,7 +67,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
   
 class CreateUpdateProfileSerializer(serializers.ModelSerializer):
-    phone = PhoneNumberField(region="IND") # type: ignore
+    phone = PhoneNumberField(region="IND")
    
     class Meta:
         model=Profiles
@@ -200,24 +200,7 @@ class TestAddressSerializer(serializers.ModelSerializer):
 class TestPlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Players
-        
-        
         fields =('aita_ranking','skills')
-        
-    def create(self, validated_data):
-     
-        player_data = None
-     
-        user_data_id=validated_data.get('player_profile_id').user_data_id
-        role=user_data_id.role
-        print("jkl;kl",role)
-        # if role=='Player':
-        #     player_data=validated_data.pop('player',None)
-        # elif role=='Coach':
-        #     coach_data=validated_data.pop('coach',None)
-        
-       
-    
 class TestCoachSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coaches
@@ -260,6 +243,7 @@ class TestProfileSerializer(serializers.ModelSerializer):
        
        
         return profile_instance
+    
 
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop('addresses', None)

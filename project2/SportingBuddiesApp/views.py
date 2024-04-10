@@ -1,8 +1,7 @@
-
-from base64 import decode
+from urllib import response
+from django import views
 from django.http import JsonResponse
 from django.shortcuts import render,redirect
-from jwt import InvalidTokenError
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,8 +10,9 @@ from django.contrib.auth.hashers import make_password,check_password
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate,logout
 from rest_framework.permissions import AllowAny,IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken  #type:ignore
-from rest_framework_simplejwt.authentication import JWTAuthentication   #type:ignore
+from rest_framework_simplejwt.authentication import JWTAuthentication    # type: ignore
 from django.shortcuts import get_object_or_404
  
 
@@ -104,6 +104,7 @@ class LoginView(APIView):
         
         try:
             user=UserDatas.objects.get(email=email)
+            print(user)
             print(password)
             print(user.password)
           
@@ -118,11 +119,12 @@ class LoginView(APIView):
         if role!=user.role:
                return Response({'error':'Role Not match'},status=400)    
            
-        refresh=RefreshToken.for_user(user)
-      
+        data_token,created=Token.objects.get_or_create(user=user)
+       
         token={
-            'refresh':str(refresh),
-            'access':str(refresh.access_token)
+            'token':data_token.key,
+            
+            
         }
         serializer=UserSerializer(user)
       
@@ -131,39 +133,30 @@ class LoginView(APIView):
   
 class LogoutView(APIView):
     serializer_class=UserLogoutSerializer
-    permission_classes = (IsAuthenticated,)
     def post(self, request):
-        try:
-            logout(request)
-            return redirect('login')
-        except Exception as e:
-            return Response(status=400)
-        
+        logout(request)
    
       
+        return redirect('login')
+  
+###########PROFILE##########
+class TestToken(APIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+
+    
+    def get(self,request,*args, **kwargs):
+        print("okoko")
+        return Response("ok")
+
+class TestToken_2(APIView):
+    permission_classes=[IsAuthenticated,]
+
+    
+    def get(self,request,*args, **kwargs):
+        return Response("ok")
         
   
-
-
-class TestToken(APIView):
-    # permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-    
-    def get(self, request, *args, **kwargs):
-        # try:
-        token = request.headers['Authorization'].split(' ')[1] 
-        print(token)
-        #     decoded_token = decode(token, 'your_secret_key', algorithms=['HS256']) # type: ignore
-        #     user_id = decoded_token['user_id']  # Extract user_id from decoded token
-        #     user = UserDatas.objects.get(id=user_id)  # Get user object using user_id
-        #     # You can perform additional checks or operations here if needed
-        #     return Response("Authorized", status=200)
-        # except KeyError:
-        #     return Response("Token not provided", status=400)
-        # except InvalidTokenError:
-        #     return Response("Invalid token", status=400)
-        # except UserDatas.DoesNotExist:
-        #     return Response("U not found", status=400)
   
 
 # class TestProfileDetailView(APIView):  
@@ -177,8 +170,6 @@ class TestProfileDetailView(generics.ListCreateAPIView):
 class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Profiles.objects.all()
     serializer_class = TestProfileSerializer
-    
-    
                
             
                     
