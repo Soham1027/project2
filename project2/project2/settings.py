@@ -117,7 +117,7 @@ WSGI_APPLICATION = 'project2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'project2',
+        'NAME': 'temp_project2',
         'USER':'soham',
         'PASSWORD':'SG@SG@123',
         'HOST':'localhost',
@@ -190,4 +190,4 @@ REST_FRAMEWORK = {
 
 }
 
-# AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'
+AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'

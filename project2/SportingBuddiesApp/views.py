@@ -103,20 +103,17 @@ class LoginView(APIView):
         role=request.data.get('role')
         
         try:
-            user=UserDatas.objects.get(email=email)
+            user=authenticate(email=email,password=password)
             print(user)
             print(password)
-            print(user.password)
+            
           
         except UserDatas.DoesNotExist:
             return Response({'error':'Invalid'},status=400)
         
-        if not check_password(password,user.password):
-            print(password)
-            print(user.password)
-            return Response({'error':'Password Invalid'},status=400) 
+        
            
-        if role!=user.role:
+        if user.role!=role: 
                return Response({'error':'Role Not match'},status=400)    
            
         data_token,created=Token.objects.get_or_create(user=user)
