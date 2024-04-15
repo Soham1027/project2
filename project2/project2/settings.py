@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'SportingBuddiesApp.middleware.MiddelewareToken',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -190,4 +191,4 @@ REST_FRAMEWORK = {
 
 }
 
-AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'
+# AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'

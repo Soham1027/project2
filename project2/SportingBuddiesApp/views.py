@@ -11,9 +11,11 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate,logout
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
+from project2.settings import SECRET_KEY
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken  #type:ignore
 from rest_framework_simplejwt.authentication import JWTAuthentication    # type: ignore
 from django.shortcuts import get_object_or_404
+import jwt # type: ignore
  
 
 
@@ -103,25 +105,26 @@ class LoginView(APIView):
         role=request.data.get('role')
         
         try:
-            user=authenticate(email=email,password=password)
-            print(user)
+            user=UserDatas.objects.get(email=email)
             print(password)
-            
+            print(user.password)
           
         except UserDatas.DoesNotExist:
             return Response({'error':'Invalid'},status=400)
         
-        
+        if not check_password(password,user.password):
+            print(password)
+            print(user.password)
+            return Response({'error':'Password Invalid'},status=400) 
            
-        if user.role!=role: 
+        if role!=user.role:
                return Response({'error':'Role Not match'},status=400)    
            
-        data_token,created=Token.objects.get_or_create(user=user)
-       
+        refresh=RefreshToken.for_user(user)
+      
         token={
-            'token':data_token.key,
-            
-            
+            'refresh':str(refresh),
+            'access':str(refresh.access_token)
         }
         serializer=UserSerializer(user)
       
@@ -143,23 +146,20 @@ class TestToken(APIView):
 
     
     def get(self,request,*args, **kwargs):
+      
         print("okoko")
         return Response("ok")
 
-class TestToken_2(APIView):
-    permission_classes=[IsAuthenticated,]
 
-    
-    def get(self,request,*args, **kwargs):
-        return Response("ok")
-        
-  
   
 
 # class TestProfileDetailView(APIView):  
   
 
 class TestProfileDetailView(generics.ListCreateAPIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+
     queryset = Profiles.objects.all()
     serializer_class = TestProfileSerializer
 

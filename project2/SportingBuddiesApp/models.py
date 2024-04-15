@@ -42,8 +42,9 @@ SURFACE_CHOICES = (
   
 )
     
-class UserDatas(AbstractUser):
-   	
+
+class UserDatas(models.Model):
+    id=models.AutoField(primary_key=True)	
     email=models.EmailField(max_length=50,validators=[EmailValidator(message="enter valid email")])
     password=models.CharField(max_length=300,validators=[MinLengthValidator(4)])
     confirm_password=models.CharField(max_length=300)
@@ -54,6 +55,8 @@ class UserDatas(AbstractUser):
     def __str__(self) -> str:
         return self.email
     
+   
+
    
 
 

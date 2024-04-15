@@ -32,7 +32,7 @@ from .views import (
     AddressDetailView,
     ProfileRetrieveUpdateDestroyAPIView,
     TestToken,
-    TestToken_2,
+    
     
 
 
@@ -66,8 +66,7 @@ urlpatterns = [
     path('profile/<int:pk>/',ProfileRetrieveUpdateDestroyAPIView.as_view(),name="profile"),
     
     path('data/',TestToken.as_view(),name="data_test"),
-    path('td/',TestToken_2.as_view(),name="td"),
-    
+   
 
     path('booking/',BookingView.as_view(),name="booking"),
     path('review/',ReviewDataView.as_view(),name="review"),
