@@ -7,21 +7,25 @@ import jwt # type: ignore
 class MiddelewareToken(MiddlewareMixin):
    
     def process_request(self,request,*args, **kwargs):
-        if request.path.startswith("/api/register/") or request.path.startswith("/api/login/")or request.path.startswith("/admin/"):
+        
+        if request.path.startswith("/api/register/") or request.path.startswith("/api/login/") or request.path.startswith("/admin/"):
             return None
         auth_header=request.headers.get('Authorization')
+        print("\nauth",auth_header)
         if not auth_header or not auth_header.startswith('Bearer '):
-            return JsonResponse({'error':'Invalid'},status=401) 
+           
+             return JsonResponse({'error':'Invalid'},status=200) 
         token =auth_header.split(' ')[1]
         # token = request.GET.get('token')
         
-      
+        print("\nADSFsd",token)
         try:
             payload = jwt.decode(jwt=token, key=SECRET_KEY, algorithms=['HS256'])
-           
+            print("Aispayload",payload)
+            
             user = UserDatas.objects.get(id=payload['user_id'])
             
-            print(user.role)
+            print("user:",user)
         except jwt.ExpiredSignatureError:   
             return JsonResponse({'Error':' expired token'},status=400)
         except jwt.InvalidTokenError:   

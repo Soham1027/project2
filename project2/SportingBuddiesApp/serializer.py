@@ -231,20 +231,20 @@ class TestProfileSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         # user=self.context['request'].user
-        # user = None
-        # request = self.context.get("request")
-        # if request and hasattr(request, "user"):
-        #     user = request.user
-        #     print("sdgsdg",user)
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+            print("sdgsdg",user)
 
         addresses_data = validated_data.pop('addresses', None)
         player_data = validated_data.pop('player', None)
         coach_data=validated_data.pop('coach',None)
-        # if user.role=="Player":
-        #     coach_data=None
-        #     print("sdgfsdfg")
-        # else:
-        #     player_data=None
+        if user=="Player":
+            coach_data=None
+            print("sdgfsdfg")
+        else:
+            player_data=None
         profile_instance = Profiles.objects.create(**validated_data)
         if addresses_data:
             Addresses.objects.create(profile_data_id=profile_instance, **addresses_data)

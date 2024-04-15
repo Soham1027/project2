@@ -13,7 +13,8 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from project2.settings import SECRET_KEY
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken  #type:ignore
-from rest_framework_simplejwt.authentication import JWTAuthentication    # type: ignore
+
+
 from django.shortcuts import get_object_or_404
 import jwt # type: ignore
  
@@ -95,7 +96,6 @@ class UserView(APIView):
 
 
 class LoginView(APIView):
-  
     serializer_class=LoginSerializer
     
    
@@ -141,9 +141,8 @@ class LogoutView(APIView):
   
 ###########PROFILE##########
 class TestToken(APIView):
-    authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
-
+   
+    
     
     def get(self,request,*args, **kwargs):
       
@@ -157,8 +156,7 @@ class TestToken(APIView):
   
 
 class TestProfileDetailView(generics.ListCreateAPIView):
-    authentication_classes=[JWTAuthentication]
-    permission_classes=[IsAuthenticated]
+  
 
     queryset = Profiles.objects.all()
     serializer_class = TestProfileSerializer
@@ -177,8 +175,7 @@ class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
      
 class ProfileDetailView(APIView):
   
-    # permission_classes=[IsAuthenticated,]
-    # authentication_classes=[JWTAuthentication]
+
     # serializer_class = CreateUpdateProfileSerializer 
     # address_serializer_class=CreateUpdateAddressSerializer 
     
