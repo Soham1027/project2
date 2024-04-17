@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.views.decorators.csrf import csrf_exempt
 from project2.settings import SECRET_KEY
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken  #type:ignore
-
+from django.db.models import Q
 
 from django.shortcuts import get_object_or_404
 import jwt # type: ignore
@@ -157,11 +157,35 @@ class TestToken(APIView):
 
 class TestProfileDetailView(generics.ListCreateAPIView):
   
-
     queryset = Profiles.objects.all()
+
     serializer_class = TestProfileSerializer
-
-
+    
+    def get_queryset(self):
+       
+        
+        
+        user=self.request.META['HTTP_USER_ID']
+        print("sdfjgsdh",user)
+        user_data=UserDatas.objects.filter(id=user).first()
+        print(user_data)
+        if user_data:
+            if user_data.role=="Player":
+                queryset=self.queryset.exclude(player__isnull=True)
+                print(queryset)
+            elif user_data.role=="Coach":
+                queryset=self.queryset.exclude(coach__isnull=True)
+                print("asdfasd",queryset)
+                
+        
+            return queryset
+    # (player__isnull=True))
+       
+            
+    def get_serializer_context(self):
+        context= super().get_serializer_context()
+        context['request']=self.request
+        return context
 class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Profiles.objects.all()
     serializer_class = TestProfileSerializer
@@ -173,80 +197,80 @@ class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
             
             
      
-class ProfileDetailView(APIView):
+# class ProfileDetailView(APIView):
   
 
-    # serializer_class = CreateUpdateProfileSerializer 
-    # address_serializer_class=CreateUpdateAddressSerializer 
+#     # serializer_class = CreateUpdateProfileSerializer 
+#     # address_serializer_class=CreateUpdateAddressSerializer 
     
-    def get(self, request, *args, **kwargs):
+#     def get(self, request, *args, **kwargs):
        
      
-        response ={'status':200}
-        profile_objs=Profiles.objects.all()
-        serializer=ProfileSerializer(profile_objs,many=True)
-        response['data']=serializer.data # type: ignore
+#         response ={'status':200}
+#         profile_objs=Profiles.objects.all()
+#         serializer=ProfileSerializer(profile_objs,many=True)
+#         response['data']=serializer.data # type: ignore
         
-        return Response(response)
+#         return Response(response)
  
-    def post(self, request, *args, **kwargs):
+#     def post(self, request, *args, **kwargs):
         
           
-        data=request.data
-        serializer=CreateUpdateProfileSerializer(data=data)
-        address_serializer=CreateUpdateAddressSerializer(data=data)
-        if serializer.is_valid() or address_serializer.is_valid():
+#         data=request.data
+#         serializer=CreateUpdateProfileSerializer(data=data)
+#         address_serializer=CreateUpdateAddressSerializer(data=data)
+#         if serializer.is_valid() or address_serializer.is_valid():
       
-            serializer.save()
-            address_serializer.save()
+#             serializer.save()
+#             address_serializer.save()
             
-            response={"status":200,"message":"Profile Data Added"}
-            return Response(response)
+#             response={"status":200,"message":"Profile Data Added"}
+#             return Response(response)
         
         
         
         
     
-        # data=request.data
-        # address_serializer=CreateUpdateAddressSerializer(data=data)
-        # if address_serializer.is_valid():
+#         # data=request.data
+#         # address_serializer=CreateUpdateAddressSerializer(data=data)
+#         # if address_serializer.is_valid():
       
-        #     address_serializer.save()
-        #     response={"status":200,"message":"Address Data Added"}
-        #     return Response(response)
+#         #     address_serializer.save()
+#         #     response={"status":200,"message":"Address Data Added"}
+#         #     return Response(response)
         
         
-        return Response(serializer.errors)
+#         return Response(serializer.errors)
 
 
     
-    def patch(self,request,*args, **kwargs):
+#     def patch(self,request,*args, **kwargs):
     
-        response={'status':200}
-        data=request.data
-        try:
-            obj=Profiles.objects.get(id=data.get('id'))
-            serializer=CreateUpdateProfileSerializer(obj,data=data,partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                response['data']=serializer.data# type: ignore
-                return Response(response)
-            else :
-                return Response(serializer.errors)
-        except Exception as e:
-            print(e)
-        return Response({'status':400,'message':'invalid id'})
+#         response={'status':200}
+#         data=request.data
+#         try:
+#             obj=Profiles.objects.get(id=data.get('id'))
+#             serializer=CreateUpdateProfileSerializer(obj,data=data,partial=True)
+#             if serializer.is_valid():
+#                 serializer.save()
+#                 response['data']=serializer.data# type: ignore
+#                 return Response(response)
+#             else :
+#                 return Response(serializer.errors)
+#         except Exception as e:
+#             print(e)
+#         return Response({'status':400,'message':'invalid id'})
         
-    def delete(self,request,*args, **kwargs):
-        response={'status':200}
-        data=request.data 
-        try:
-            obj=Profiles.objects.get(id=data.get('id'))
-            obj.delete()
-            return Response({'status':200,'message':"Deleted"})
-        except Exception as e:
-            print(e)
-        return Response({'status':400,'message':"Invalid id"})
+#     def delete(self,request,*args, **kwargs):
+#         response={'status':200}
+#         data=request.data 
+#         try:
+#             obj=Profiles.objects.get(id=data.get('id'))
+#             obj.delete()
+#             return Response({'status':200,'message':"Deleted"})
+#         except Exception as e:
+#             print(e)
+#         return Response({'status':400,'message':"Invalid id"})
     
     
     

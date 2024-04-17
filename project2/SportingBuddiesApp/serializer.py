@@ -219,32 +219,63 @@ class TestProfileSerializer(serializers.ModelSerializer):
 
   
     def to_representation(self, instance):
-        representation=super().to_representation(instance)
-        user_data_id=instance.user_data_id
         
-        if user_data_id.role=='Player':
-            representation.pop('coach',None)
-        elif user_data_id.role=='Coach':
-            representation.pop('player',None)
+        representation=super().to_representation(instance)
+        request =self.context['request']
+        user=request.META['HTTP_USER_ID']
+        if user:
+            user_data=UserDatas.objects.get(id=user)
+            print(user_data.role)
+            if user_data.role=="Player":
+                representation.pop('coach',None)
+                # return None
+               
+            elif user_data.role=="Coach":
+                representation.pop('player',None)
+                # return None
+           
+                
+            else:
+                print("user has different role")
+        else:
+            print("user not exists")
+    
+        
+        
         
         return {"profiles":representation}
     
     def create(self, validated_data):
-        # user=self.context['request'].user
-        user = None
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            user = request.user
-            print("sdgsdg",user)
+        # user=validated_data.context['request'].user
+      
+        request =self.context['request']
+        user=request.META['HTTP_USER_ID']
+    
+        print("sdgsdg",user)
+
+      
+        # print(user)
+        # # print("dsf",request)
+        # # if user and not isinstance(user,AnonymousUser): # type: ignore
+           
 
         addresses_data = validated_data.pop('addresses', None)
         player_data = validated_data.pop('player', None)
         coach_data=validated_data.pop('coach',None)
-        if user=="Player":
-            coach_data=None
-            print("sdgfsdfg")
+        if user:
+            user_data=UserDatas.objects.get(id=user)
+            print(user_data.role)
+            if user_data.role=="Player":
+                coach_data=None
+            elif user_data.role=="Coach":
+                player_data=None
+                
+            else:
+                print("user has different role")
         else:
-            player_data=None
+            print("user not exists")
+       
+            
         profile_instance = Profiles.objects.create(**validated_data)
         if addresses_data:
             Addresses.objects.create(profile_data_id=profile_instance, **addresses_data)
@@ -257,44 +288,44 @@ class TestProfileSerializer(serializers.ModelSerializer):
         return profile_instance
     
 
-    def update(self, instance, validated_data):
-        addresses_data = validated_data.pop('addresses', None)
-        player_data=validated_data.pop('player',None)
-        coach_data=validated_data.pop('coach',None)
-        instance.name = validated_data.get('name', instance.name)
-        instance.birthdate = validated_data.get('birthdate', instance.birthdate)
-        instance.gender = validated_data.get('gender', instance.gender)
-        instance.nationality = validated_data.get('nationality', instance.nationality)
-        instance.phone = validated_data.get('phone', instance.phone)
-        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
-        instance.user_data_id = validated_data.get('user_data_id', instance.user_data_id)
-        instance.save()
+    # def update(self, instance, validated_data):
+    #     addresses_data = validated_data.pop('addresses', None)
+    #     player_data=validated_data.pop('player',None)
+    #     coach_data=validated_data.pop('coach',None)
+    #     instance.name = validated_data.get('name', instance.name)
+    #     instance.birthdate = validated_data.get('birthdate', instance.birthdate)
+    #     instance.gender = validated_data.get('gender', instance.gender)
+    #     instance.nationality = validated_data.get('nationality', instance.nationality)
+    #     instance.phone = validated_data.get('phone', instance.phone)
+    #     instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
+    #     instance.user_data_id = validated_data.get('user_data_id', instance.user_data_id)
+    #     instance.save()
 
-        if addresses_data:
-            if instance.addresses:
-                addresses_serializer = TestAddressSerializer(instance.addresses, data=addresses_data)
-                if addresses_serializer.is_valid():
-                    addresses_serializer.save()
-            else:
-                Addresses.objects.create(profile_data_id=instance, **addresses_data)
+    #     if addresses_data:
+    #         if instance.addresses:
+    #             addresses_serializer = TestAddressSerializer(instance.addresses, data=addresses_data)
+    #             if addresses_serializer.is_valid():
+    #                 addresses_serializer.save()
+    #         else:
+    #             Addresses.objects.create(profile_data_id=instance, **addresses_data)
                 
-        if player_data:
-            if instance.player:
-                player_serializer = TestPlayerSerializer(instance.player, data=player_data)
-                if player_serializer.is_valid():
-                    player_serializer.save()
-            else:
-                Players.objects.create(player_profile_id=instance, **player_data)
+    #     if player_data:
+    #         if instance.player:
+    #             player_serializer = TestPlayerSerializer(instance.player, data=player_data)
+    #             if player_serializer.is_valid():
+    #                 player_serializer.save()
+    #         else:
+    #             Players.objects.create(player_profile_id=instance, **player_data)
         
-        if coach_data:
-            if instance.coach:
-                coach_serializer = TestCoachSerializer(instance.coach, data=coach_data)
-                if coach_serializer.is_valid():
-                    coach_serializer.save()
-            else:
-                Coaches.objects.create(coaches_profile_id=instance, **coach_data)
+    #     if coach_data:
+    #         if instance.coach:
+    #             coach_serializer = TestCoachSerializer(instance.coach, data=coach_data)
+    #             if coach_serializer.is_valid():
+    #                 coach_serializer.save()
+    #         else:
+    #             Coaches.objects.create(coaches_profile_id=instance, **coach_data)
                 
                 
        
-        return (instance)
+    #     return (instance)
   

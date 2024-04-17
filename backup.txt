@@ -275,3 +275,42 @@ user_id=access_token.payload.get('user_id')
 
   
   }
+
+
+
+{ 
+  "name":"abc",
+  "birthdate":"2002-03-02",
+  "gender":"MALE",
+  "nationality":"IN",
+  "phone":"+919293949569",
+  "user_data_id":2,
+  "addresses":{
+    "flat_no":5,
+    "landmark":"sdgs",
+    "area":"fghfgj",
+    "city":"Ahmedabad",
+    "zip_code":234234
+  
+  },
+  
+  "coach":{
+    "qualification":"adg",
+    "certificate":"sdfgsf",
+    "prices":5473,
+    "technique":"dgfhdgh,
+    "specialities":"INTERMEDIATE",
+    "experience":6
+    
+  }
+    
+  
+
+  
+  }
+
+
+
+
+
+

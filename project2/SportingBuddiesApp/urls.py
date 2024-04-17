@@ -26,7 +26,7 @@ from .views import (
     CourtDetailView,
     TestProfileDetailView,
     UserView,
-    ProfileDetailView,
+  
     LogoutView,
     LoginView,
     AddressDetailView,

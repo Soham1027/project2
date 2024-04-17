@@ -23,9 +23,14 @@ class MiddelewareToken(MiddlewareMixin):
             payload = jwt.decode(jwt=token, key=SECRET_KEY, algorithms=['HS256'])
             print("Aispayload",payload)
             
-            user = UserDatas.objects.get(id=payload['user_id'])
+            # user = UserDatas.objects.get(id=payload['user_id'])
+       
             
-            print("user:",user)
+           
+            print("user:",payload['user_id']) 
+           
+            request.META['HTTP_USER_ID']=payload['user_id']
+            
         except jwt.ExpiredSignatureError:   
             return JsonResponse({'Error':' expired token'},status=400)
         except jwt.InvalidTokenError:   
