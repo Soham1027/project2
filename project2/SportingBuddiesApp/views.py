@@ -29,6 +29,7 @@ from .models import (
 
 )
 from .serializer import (
+    ProfileSerializer,
     UserSerializer,
     UserLogoutSerializer,
 
@@ -79,6 +80,8 @@ class UserView(APIView):
         response['data'] = serializer.data  # type: ignore
 
         return Response(response)
+    
+    
     def patch(self, request, *args, **kwargs):
 
         response = {'status': 200}
@@ -142,14 +145,6 @@ class LogoutView(APIView):
 
 
 ###########PROFILE##########
-class TestToken(APIView):
-
-    def get(self, request, *args, **kwargs):
-        print("okoko")
-        return Response("ok")
-
-
-# class TestProfileDetailView(APIView):
 
 
 class TestProfileDetailView(generics.ListCreateAPIView):
@@ -181,20 +176,28 @@ class TestProfileDetailView(generics.ListCreateAPIView):
         return context
 
 
-class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class TestProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Profiles.objects.all()
     serializer_class = TestProfileSerializer
 
 
-######################ADDRESS###########
 
 
-###########PLAYER##########
+########### Ground Provider Profile##########
+
+class ProfileDetailView(generics.ListCreateAPIView):
+    queryset = Profiles.objects.all()
+
+    serializer_class = ProfileSerializer
+
+  
+
+  
 
 
-
-
-###########COACH##########
+class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Profiles.objects.all()
+    serializer_class = ProfileSerializer
 
 
 
@@ -224,33 +227,9 @@ class GroundProviderView(APIView):
 
         return Response(serializer.errors)
 
-    def patch(self, request, *args, **kwargs):
-
-        response = {'status': 200}
-        data = request.data
-        try:
-            obj = GroundProviders.objects.get(id=data.get('id'))
-            serializer = CreateUpdateGroundProviderSerializer(obj, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                response['data'] = serializer.data  # type: ignore
-                return Response(response)
-            else:
-                return Response(serializer.errors)
-        except Exception as e:
-            print(e)
-        return Response({'status': 400, 'message': 'invalid id'})
-
-    def delete(self, request, *args, **kwargs):
-        response = {'status': 200}
-        data = request.data
-        try:
-            obj = GroundProviders.objects.get(id=data.get('id'))
-            obj.delete()
-            return Response({'status': 200, 'message': "Deleted"})
-        except Exception as e:
-            print(e)
-        return Response({'status': 400, 'message': "Invalid id"})
+class GroundProviderUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = GroundProviders.objects.all()
+    serializer_class = CreateUpdateGroundProviderSerializer
 
 
 ###########COURTDETAIl##########

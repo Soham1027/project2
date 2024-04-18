@@ -73,7 +73,7 @@ class Profiles(models.Model):
     updated_at=models.DateTimeField(auto_now=True)
    	
     def __str__(self) -> str:
-        return self.user_data_id.role #type:ignore
+        return self.name #type:ignore
 
     
 
@@ -108,7 +108,7 @@ class Players(models.Model):
     player_profile_id=models.OneToOneField(Profiles,on_delete=models.CASCADE,null=True,related_name="player")
    	
     def __str__(self) -> str:
-        return (self.player_profile_id.user_data_id.role) #type:ignore
+        return (self.player_profile_id.name) #type:ignore
     
 class Coaches(models.Model):
     id=models.AutoField(primary_key=True)

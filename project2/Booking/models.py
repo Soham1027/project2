@@ -38,7 +38,7 @@ class Bookings(models.Model):
     confirm_status = models.BooleanField(default=True)
 
     def __str__(self) -> str:
-        return str(self.id)
+        return str(self.id) # type: ignore
 
 
 class PaymentDatas(models.Model):

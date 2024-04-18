@@ -104,6 +104,8 @@ class TestProfileSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         request = self.context['request']
         user = request.META['HTTP_USER_ID']
+        print("sfghfhrrt",request)
+        
         if user:
             user_data = UserDatas.objects.get(id=user)
             print(user_data.role)
@@ -198,9 +200,73 @@ class TestProfileSerializer(serializers.ModelSerializer):
 
         return (instance)
 
+class ProfileSerializer(serializers.ModelSerializer):
+    phone = PhoneNumberField(region="IN")
+    addresses = TestAddressSerializer(required=False)
+   
+
+    class Meta:
+        model = Profiles
+        fields = (
+            'id', 'name', 'birthdate', 'gender', 'nationality', 'phone', 'profile_pic', 'user_data_id', 'addresses')
+
+    def validate_phone(self, value):
+        phone_number = to_python(value)
+        if phone_number:
+            if not phone_number.is_valid():
+                raise serializers.ValidationError("Enter valid phone number")
+            if not str(phone_number.country_code) == "91":
+                raise serializers.ValidationError("Number has must extension +91")
+        return value
+
+  
+
+    def create(self, validated_data):
+        # user=validated_data.context['request'].user
+
+        request = self.context['request']
+        user = request.META['HTTP_USER_ID']
+
+        print("sdgsdg", user)
+
+
+
+        addresses_data = validated_data.pop('addresses', None)
+    
+       
+
+        profile_instance = Profiles.objects.create(**validated_data)
+        if addresses_data:
+            Addresses.objects.create(profile_data_id=profile_instance, **addresses_data)
+        
+        return profile_instance
+
+    def update(self, instance, validated_data):
+        addresses_data = validated_data.pop('addresses', None)
+      
+        instance.name = validated_data.get('name', instance.name)
+        instance.birthdate = validated_data.get('birthdate', instance.birthdate)
+        instance.gender = validated_data.get('gender', instance.gender)
+        instance.nationality = validated_data.get('nationality', instance.nationality)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.profile_pic = validated_data.get('profile_pic', instance.profile_pic)
+        instance.user_data_id = validated_data.get('user_data_id', instance.user_data_id)
+        instance.save()
+
+        if addresses_data:
+            if instance.addresses:
+                addresses_serializer = TestAddressSerializer(instance.addresses, data=addresses_data)
+                if addresses_serializer.is_valid():
+                    addresses_serializer.save()
+            else:
+                Addresses.objects.create(profile_data_id=instance, **addresses_data)
+
+       
+
+        return (instance)
 
 class GroundProviderSerializer(serializers.ModelSerializer):
-    ground_provider_profile_id = TestProfileSerializer(many=False)
+    ground_provider_profile_id = ProfileSerializer(many=False)
 
     # ground_provider_profile_id= serializers.StringRelatedField(many=False)
 

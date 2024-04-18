@@ -13,9 +13,9 @@ from SportingBuddiesApp.serializer import (
 
 
 class ProfileAvailabilitySerializer(serializers.ModelSerializer):
-    profiles_ids = TestProfileSerializer(many=False)
+    # profiles_ids = TestProfileSerializer(many=False)
 
-    # profiles_ids= serializers.StringRelatedField(many=False)
+    profiles_ids= serializers.StringRelatedField(many=False)
 
     class Meta:
         model = ProfileAvailabilities
@@ -29,8 +29,8 @@ class CreateUpdateProfileAvailabilitySerializer(serializers.ModelSerializer):
 
 
 class CourtAvailabilitySerializer(serializers.ModelSerializer):
-    # courts_ids=CourtDetailSerializer(many=False)
-    courts_ids = serializers.StringRelatedField(many=False)
+    courts_ids=CourtDetailSerializer(many=False)
+    # courts_ids = serializers.StringRelatedField(many=False)
 
     class Meta:
         model = CourtAvailabilities
