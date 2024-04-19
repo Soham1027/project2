@@ -36,7 +36,7 @@ from .serializer import (
     
     CourtDetailSerializer,
    
-    GroundProviderSerializer,
+
     TestAddressSerializer,
     TestProfileSerializer,
 
@@ -189,6 +189,23 @@ class ProfileDetailView(generics.ListCreateAPIView):
     queryset = Profiles.objects.all()
 
     serializer_class = ProfileSerializer
+    
+    def get_queryset(self):
+
+        user = self.request.META['HTTP_USER_ID']
+        print("sdfjgsdh", user)
+        user_data = UserDatas.objects.filter(id=user).first()
+        print(user_data)
+        if user_data:
+            if user_data.role == "Ground Owner":
+                queryset = self.queryset.exclude(ground_provider__isnull=True)
+                print(queryset)
+          
+            return queryset
+
+    # (player__isnull=True))
+
+
 
   
 
@@ -203,33 +220,33 @@ class ProfileRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
 
 ########### Ground Provider ##########
 
-class GroundProviderView(APIView):
-    # permission_classes=[IsAuthenticated,]
-    # authentication_classes=[JWTAuthentication]
+# class GroundProviderView(APIView):
+#     # permission_classes=[IsAuthenticated,]
+#     # authentication_classes=[JWTAuthentication]
 
-    serializer_class = CreateUpdateGroundProviderSerializer
+#     serializer_class = CreateUpdateGroundProviderSerializer
 
-    def get(self, request, *args, **kwargs):
-        response = {'status': 200}
-        ground_provider_objs = GroundProviders.objects.all()
-        serializer = GroundProviderSerializer(ground_provider_objs, many=True)
-        response['data'] = serializer.data  # type: ignore
+#     def get(self, request, *args, **kwargs):
+#         response = {'status': 200}
+#         ground_provider_objs = GroundProviders.objects.all()
+#         serializer = GroundProviderSerializer(ground_provider_objs, many=True)
+#         response['data'] = serializer.data  # type: ignore
 
-        return Response(response)
+#         return Response(response)
 
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        serializer = CreateUpdateGroundProviderSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            response = {"status": 200, "message": "Ground Data Added"}
-            return Response(response)
+#     def post(self, request, *args, **kwargs):
+#         data = request.data
+#         serializer = CreateUpdateGroundProviderSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             response = {"status": 200, "message": "Ground Data Added"}
+#             return Response(response)
 
-        return Response(serializer.errors)
+#         return Response(serializer.errors)
 
-class GroundProviderUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = GroundProviders.objects.all()
-    serializer_class = CreateUpdateGroundProviderSerializer
+# class GroundProviderUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = GroundProviders.objects.all()
+#     serializer_class = CreateUpdateGroundProviderSerializer
 
 
 ###########COURTDETAIl##########

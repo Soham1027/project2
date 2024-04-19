@@ -394,4 +394,34 @@ user_id=access_token.payload.get('user_id')
 
 
 
+[
+  {
+    "profiles": {
+      
+      "name": "g2",
+      "birthdate": "2002-03-02",
+      "gender": "MALE",
+      "nationality": "IN",
+      "phone": "+919293949569",
+      "profile_pic": null,
+      "user_data_id": 8,
+      "addresses": {
+        "flat_no": "5",
+        "landmark": "sdgs",
+        "area": "ghj",
+        "city": "Ahmedabad",
+        "zip_code": 234234
+      },
+      "ground_provider": [
+        {
+         
+          "ground_name": "abc ground",
+          "ammenities": "asgtuty",
+          "facilities": "z,z,cf"
+        }
+      ]
+    }
+  }
+]
+
 

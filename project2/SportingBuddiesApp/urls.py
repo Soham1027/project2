@@ -16,7 +16,7 @@ from .views import (
 
 
     
-    GroundProviderView,
+   
     ProfileDetailView,
 
     CourtDetailView,
@@ -27,7 +27,7 @@ from .views import (
     LoginView,
 
     TestProfileRetrieveUpdateDestroyAPIView,
-    GroundProviderUpdateDestroyAPIView,
+    
     ProfileRetrieveUpdateDestroyAPIView
    
 
@@ -36,8 +36,8 @@ from .views import (
 urlpatterns = [
 
 
-    path('ground_provider/', GroundProviderView.as_view(), name="ground_provider"),
-    path('ground_provider/<int:pk>/', GroundProviderUpdateDestroyAPIView.as_view(), name="ground_provider"),
+    # path('ground_provider/', GroundProviderView.as_view(), name="ground_provider"),
+    # path('ground_provider/<int:pk>/', GroundProviderUpdateDestroyAPIView.as_view(), name="ground_provider"),
 
     path('profile_availability/', ProfileAvailabilityView.as_view(), name="profile_availability"),
     path('court_availability/', CourtAvailabilityView.as_view(), name="court_availability"),

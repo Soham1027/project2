@@ -200,15 +200,24 @@ class TestProfileSerializer(serializers.ModelSerializer):
 
         return (instance)
 
+
+
+class CreateUpdateGroundProviderSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = GroundProviders
+        fields = ('id', 'ground_name', 'ammenities', 'facilities')
+
 class ProfileSerializer(serializers.ModelSerializer):
     phone = PhoneNumberField(region="IN")
     addresses = TestAddressSerializer(required=False)
+    ground_provider = CreateUpdateGroundProviderSerializer(required=False,many=True)
    
-
     class Meta:
         model = Profiles
         fields = (
-            'id', 'name', 'birthdate', 'gender', 'nationality', 'phone', 'profile_pic', 'user_data_id', 'addresses')
+            'id', 'name', 'birthdate', 'gender', 'nationality', 'phone', 'profile_pic', 'user_data_id', 'addresses',
+            'ground_provider')
 
     def validate_phone(self, value):
         phone_number = to_python(value)
@@ -219,31 +228,55 @@ class ProfileSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Number has must extension +91")
         return value
 
-  
+    def to_representation(self, instance):
+
+        representation = super().to_representation(instance)
+        request = self.context['request']
+        user = request.META['HTTP_USER_ID']
+        print("sfghfhrrt",request)
+        
+        if user:
+            user_data = UserDatas.objects.get(id=user)
+            print(user_data.role)
+            if user_data.role == "Ground Owner":
+                return {"profiles": representation}
+
+        
+
+
+            else:
+                print("user has different role")
+        else:
+            print("user not exists")
+
+        
 
     def create(self, validated_data):
         # user=validated_data.context['request'].user
 
-        request = self.context['request']
-        user = request.META['HTTP_USER_ID']
-
-        print("sdgsdg", user)
+     
+        
 
 
 
         addresses_data = validated_data.pop('addresses', None)
-    
+        ground_provider_data = validated_data.pop('ground_provider', None)
        
+        
 
         profile_instance = Profiles.objects.create(**validated_data)
         if addresses_data:
             Addresses.objects.create(profile_data_id=profile_instance, **addresses_data)
-        
+        if ground_provider_data:
+            for data in ground_provider_data:
+                GroundProviders.objects.create(ground_provider_profile_id=profile_instance, **data)
+    
         return profile_instance
 
     def update(self, instance, validated_data):
         addresses_data = validated_data.pop('addresses', None)
-      
+        ground_provider_data = validated_data.pop('ground_provider', None)
+       
         instance.name = validated_data.get('name', instance.name)
         instance.birthdate = validated_data.get('birthdate', instance.birthdate)
         instance.gender = validated_data.get('gender', instance.gender)
@@ -261,30 +294,23 @@ class ProfileSerializer(serializers.ModelSerializer):
             else:
                 Addresses.objects.create(profile_data_id=instance, **addresses_data)
 
-       
+        if ground_provider_data:
+            if instance.ground_provider:
+                for provider_instance,data in zip(instance.ground_provider.all(),ground_provider_data):
+                    ground_provider_data_serializer = CreateUpdateGroundProviderSerializer(provider_instance, data=data)
+                    if ground_provider_data_serializer.is_valid():
+                        ground_provider_data_serializer.save()
+            else:
+                for data in ground_provider_data:
+                    GroundProviders.objects.create(ground_provider_profile_id=instance, **data)
 
         return (instance)
 
-class GroundProviderSerializer(serializers.ModelSerializer):
-    ground_provider_profile_id = ProfileSerializer(many=False)
-
-    # ground_provider_profile_id= serializers.StringRelatedField(many=False)
-
-    class Meta:
-        model = GroundProviders
-        fields = ('id', 'ground_name', 'ammenities', 'facilities', 'ground_provider_profile_id')
-
-
-class CreateUpdateGroundProviderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GroundProviders
-        fields = ('id', 'ground_name', 'ammenities', 'facilities', 'ground_provider_profile_id')
-
 
 class CourtDetailSerializer(serializers.ModelSerializer):
-    ground_datas_ids = GroundProviderSerializer(many=False)
+    # ground_datas_ids = CreateUpdateGroundProviderSerializer(many=False)
 
-    # ground_datas_ids= serializers.StringRelatedField(many=False)
+    ground_datas_ids= serializers.StringRelatedField(many=False)
 
     class Meta:
         model = CourtDetails

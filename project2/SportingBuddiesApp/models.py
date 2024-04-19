@@ -135,13 +135,13 @@ class GroundProviders(models.Model):
     facilities=models.TextField()
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models. DateTimeField(auto_now=True)
-    ground_provider_profile_id=models.ForeignKey(Profiles,on_delete=models.CASCADE,null=True)
+    ground_provider_profile_id=models.ForeignKey(Profiles,on_delete=models.CASCADE,null=True,related_name="ground_provider")
    	
 
 
     
     def __str__(self) -> str:
-        return self.ground_name#type:ignore
+        return self.ground_name
  
 
 
