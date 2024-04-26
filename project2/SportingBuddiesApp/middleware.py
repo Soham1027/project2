@@ -37,6 +37,7 @@ class MiddelewareToken(MiddlewareMixin):
             return JsonResponse({'Error': ' Invalid token'}, status=400)
         except UserDatas.DoesNotExist:
             return JsonResponse({'Error': ' user not exists'}, status=400)
+       
         except Exception as e:
             print(f"Unknown Error:{e}")
             return JsonResponse({"error": "server error"}, status=400)
