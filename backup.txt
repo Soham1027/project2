@@ -424,4 +424,55 @@ user_id=access_token.payload.get('user_id')
   }
 ]
 
+#stripe
 
+model
+  
+    transaction_id=models.CharField(max_length=200,blank=True, null=True)
+    amount=models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True)
+    payment_status=models.CharField(max_length=200,default='pending')
+
+serializer
+class PaymentDataSerializer(serializers.ModelSerializer):
+    # booking_id=BookingSerializer(many=False)
+    booking_id = serializers.StringRelatedField(many=False)
+
+    class Meta:
+        model = PaymentDatas
+        fields = ('id', 'coach_refund', 'court_refund', 'reason', 'cancel_status', 'booking_id','transaction_id','amount','payment_status')
+
+
+class CreateUpdatePaymentDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentDatas
+        fields = ('id', 'coach_refund', 'court_refund', 'reason', 'cancel_status', 'booking_id','transaction_id','amount','payment_status')
+      
+views
+import stripe
+import stripe.error 
+from project2.settings import STRIPE_TEST_PUBLIC_KEY,STRIPE_TEST_SECRET_KEY
+
+stripe.api_key=STRIPE_TEST_SECRET_KEY
+
+
+    try:
+                amount=data.get('amount')
+                payment_intent=stripe.PaymentIntent.create(
+                    amount=int(amount*100),
+                    currency='usd',
+                    payment_method_types=['cards'],
+                )
+                serializer.save(transaction_id=payment_intent.id,
+                                amount=amount,
+                                payment_status='pending'
+                    )
+                response = {"status": 200, "message": "Booking Cancel"}
+                return Response(response)
+            except stripe.error.StripeError as e:
+                return Response({"status":400,"message":str(e)})
+                
+
+settings
+
+STRIPE_TEST_SECRET_KEY='sk_test_51P9oq6SDSgjpwmwKQTFrSF4sYvnVHy8DjTsv9DnU2x2uqCPcaatdzHkDNlpS0Pg0QnpJEszOyHHcqZoZLYXaBQNN00IJ6f5O4o'
+STRIPE_TEST_PUBLIC_KEY='pk_test_51P9oq6SDSgjpwmwKTvIhqJP2yjMmMVlpj3EqGWWDi1R13nkTm4aukBK1znKr4EPFm1zSRafG0HvfGDBoXbnPad7O00q61nJmxk'
