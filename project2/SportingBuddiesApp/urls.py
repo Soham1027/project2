@@ -57,7 +57,7 @@ urlpatterns = [
     
     path('profile/<int:pk>/', TestProfileRetrieveUpdateDestroyAPIView.as_view(), name="profile"),
 
-   
+ 
     path('booking/', BookingView.as_view(), name="booking"),
     path('review/', ReviewDataView.as_view(), name="review"),
     path('payment/', PaymentDataView.as_view(), name="payment"),

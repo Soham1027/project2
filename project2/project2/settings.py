@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'SportingBuddiesApp',
     'Booking',
+    'stripe',
     'DataAvailability',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -158,3 +159,7 @@ REST_FRAMEWORK = {
 }
 
 # AUTH_USER_MODEL='SportingBuddiesApp.UserDatas'
+
+
+STRIPE_TEST_SECRET_KEY='sk_test_51P9oq6SDSgjpwmwKQTFrSF4sYvnVHy8DjTsv9DnU2x2uqCPcaatdzHkDNlpS0Pg0QnpJEszOyHHcqZoZLYXaBQNN00IJ6f5O4o'
+STRIPE_TEST_PUBLIC_KEY='pk_test_51P9oq6SDSgjpwmwKTvIhqJP2yjMmMVlpj3EqGWWDi1R13nkTm4aukBK1znKr4EPFm1zSRafG0HvfGDBoXbnPad7O00q61nJmxk'

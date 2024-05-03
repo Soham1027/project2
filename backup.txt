@@ -455,22 +455,69 @@ from project2.settings import STRIPE_TEST_PUBLIC_KEY,STRIPE_TEST_SECRET_KEY
 stripe.api_key=STRIPE_TEST_SECRET_KEY
 
 
-    try:
-                amount=data.get('amount')
-                payment_intent=stripe.PaymentIntent.create(
-                    amount=int(amount*100),
-                    currency='usd',
-                    payment_method_types=['cards'],
-                )
-                serializer.save(transaction_id=payment_intent.id,
-                                amount=amount,
-                                payment_status='pending'
+  
+class PaymentDataView(APIView):
+    serializer_class = CreateUpdatePaymentDataSerializer
+
+    def get(self, request, *args, **kwargs):
+        response = {'status': 200}
+        booking_objs = PaymentDatas.objects.all()
+        serializer = PaymentDataSerializer(booking_objs, many=True)
+        response['data'] = serializer.data  # type: ignore
+
+        return Response(response)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        serializer = CreateUpdatePaymentDataSerializer(data=data)
+        if serializer.is_valid():
+            
+            try:
+                    amount=data.get('amount')
+                    payment_intent=stripe.PaymentIntent.create(
+                        amount=int(amount*100),
+                        currency='usd',
+                        payment_method_types=['cards'],
                     )
-                response = {"status": 200, "message": "Booking Cancel"}
-                return Response(response)
+                    serializer.save(transaction_id=payment_intent.id,
+                                    amount=amount,
+                                    payment_status='pending'
+                        )
+                    response = {"status": 200, "message": "Booking Cancel"}
+                    return Response(response)
             except stripe.error.StripeError as e:
                 return Response({"status":400,"message":str(e)})
-                
+            
+        return Response(serializer.errors)
+
+    def patch(self, request, *args, **kwargs):
+
+        response = {'status': 200}
+        data = request.data
+        try:
+            obj = PaymentDatas.objects.get(id=data.get('id'))
+            serializer = CreateUpdatePaymentDataSerializer(obj, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                response['data'] = serializer.data  # type: ignore
+                return Response(response)
+            else:
+                return Response(serializer.errors)
+        except Exception as e:
+            print(e)
+        return Response({'status': 400, 'message': 'invalid id'})
+
+    def delete(self, request, *args, **kwargs):
+        response = {'status': 200}
+        data = request.data
+        try:
+            obj = PaymentDatas.objects.get(id=data.get('id'))
+            obj.delete()
+            return Response({'status': 200, 'message': "Deleted"})
+        except Exception as e:
+            print(e)
+        return Response({'status': 400, 'message': "Invalid id"})
+
 
 settings
 
